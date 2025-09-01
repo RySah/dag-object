@@ -51,11 +51,11 @@ namespace dag
         using ReachableFn = std::function<bool(DagIndexType from, DagIndexType to, const Edge& edge)>;
 
         bool reachable(DagIndexType from, DagIndexType target,
-            ReachableFn fn = [](DagIndexType, DagIndexType, const Edge&) { return true; }) const
+            ReachableFn edgeFilter = [](DagIndexType, DagIndexType, const Edge&) { return true; }) const
         {
             if (from >= nodeCount || target >= nodeCount) return false;
             std::vector<bool> seen(MaxNodes, false);
-            return dfsReachable(from, target, seen, fn);
+            return dfsReachable(from, target, seen, edgeFilter);
         }
 
         DagIndexType addNode(const T& data) {
@@ -137,13 +137,13 @@ namespace dag
             }
         }
 
-        bool dfsReachable(DagIndexType current, DagIndexType target, std::vector<bool>& seen, ReachableFn fn) const {
+        bool dfsReachable(DagIndexType current, DagIndexType target, std::vector<bool>& seen, ReachableFn edgeFilter) const {
             if (current == target) return true;
             if (seen[current]) return false;
             seen[current] = true;
 
             for (DagIndexType e = nodes[current].firstEdge; e != npos; e = edges[e].next) {
-                if (fn(current, edges[e].to, edges[e]) && dfsReachable(edges[e].to, target, seen, fn))
+                if (edgeFilter(current, edges[e].to, edges[e]) && dfsReachable(edges[e].to, target, seen, edgeFilter))
                     return true;
             }
             return false;
@@ -176,17 +176,17 @@ namespace dag
             return true;
         }
 
-        bool reachable(DagIndexType from, DagIndexType target, ReachableFn fn = nullptr) const {
+        bool reachable(DagIndexType from, DagIndexType target, ReachableFn edgeFilter = nullptr) const {
             if (from >= nodes.size() || target >= nodes.size()) return false;
             std::vector<bool> seen(nodes.size(), false);
-            return dfsReachable(from, target, seen, fn);
+            return dfsReachable(from, target, seen, edgeFilter);
         }
 
-        std::vector<DagIndexType> topologicalSort(ReachableFn fn = nullptr) const {
+        std::vector<DagIndexType> topologicalSort(ReachableFn edgeFilter = nullptr) const {
             std::vector<DagIndexType> indegree(nodes.size(), 0);
             for (DagIndexType i = 0; i < nodes.size(); i++) {
                 for (auto& [to, flags] : nodes[i].edges) {
-                    if (!fn || fn(i, to, flags)) indegree[to]++;
+                    if (!edgeFilter || edgeFilter(i, to, flags)) indegree[to]++;
                 }
             }
 
@@ -198,7 +198,7 @@ namespace dag
                 auto n = q.front(); q.pop();
                 order.push_back(n);
                 for (auto& [to, flags] : nodes[n].edges) {
-                    if (!fn || fn(n, to, flags)) {
+                    if (!edgeFilter || edgeFilter(n, to, flags)) {
                         if (--indegree[to] == 0) q.push(to);
                     }
                 }
@@ -241,14 +241,14 @@ namespace dag
             }
         }
 
-        bool dfsReachable(DagIndexType current, DagIndexType target, std::vector<bool>& seen, ReachableFn fn) const {
+        bool dfsReachable(DagIndexType current, DagIndexType target, std::vector<bool>& seen, ReachableFn edgeFilter) const {
             if (current == target) return true;
             if (seen[current]) return false;
             seen[current] = true;
 
             for (auto& [to, flags] : nodes[current].edges) {
-                if (!fn || fn(current, to, flags)) {
-                    if (dfsReachable(to, target, seen, fn)) return true;
+                if (!edgeFilter || edgeFilter(current, to, flags)) {
+                    if (dfsReachable(to, target, seen, edgeFilter)) return true;
                 }
             }
             return false;
