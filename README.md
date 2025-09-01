@@ -111,7 +111,7 @@ dag::DynamicDAG<T>
 - `DagIndexType addNode(const T& data)`: Adds a node and returns an ID/index.
 - `T* addEdge(DagIndexType from, DagIndexType to, DagEdgeFlags flags = 0)`: Adds a edge and returns an pointer to value stored with `from`.
 - `std::vector<DagIndexType> topologicalSort(ReachableFn edgeFilter = nullptr) const`: Returns a vector of indexes by which represents the sorted graph.
-- `[collection]<std::vector<DagIndexType>> transitivelyReducePerNode(ReachableFn edgeFilter = nullptr) const`: Returns routes for each node, by which points to another.
+- `[collection]<std::vector<DagIndexType>> transitivelyReducePerNode(ReachableFn edgeFilter = nullptr) const`: Returns routes for each node (by index)
 
 ## How It Works
 
