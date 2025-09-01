@@ -108,27 +108,23 @@ namespace dag
             auto order = topologicalSort(edgeFilter);
 
             for (auto u : order) {
-                std::vector<bool> reachable(MaxNodes, false);
-                for (DagIndexType e = nodes[u].firstEdge; e != npos; e = edges[e].next) {
-                    dfsMark(edges[e].to, reachable);
-                }
-
                 for (DagIndexType e = nodes[u].firstEdge; e != npos; e = edges[e].next) {
                     auto v = edges[e].to;
-                    bool redundant = false;
+                    // Custom reachability: skip the direct edge (u, v)
+                    std::vector<bool> seen(MaxNodes, false);
+                    bool altPath = false;
                     for (DagIndexType f = nodes[u].firstEdge; f != npos; f = edges[f].next) {
-                        if (f != e && reachable[v]) {
-                            redundant = true;
+                        if (f == e) continue; // skip direct edge
+                        if (dfsReachable(edges[f].to, v, seen, edgeFilter)) {
+                            altPath = true;
                             break;
                         }
                     }
-
-                    if (!redundant) {
+                    if (!altPath) {
                         reducedEdges[u].push_back(v);
                     }
                 }
             }
-
             return reducedEdges;
         }
 
@@ -216,23 +212,23 @@ namespace dag
 
             auto order = topologicalSort();
             for (auto u : order) {
-                std::vector<bool> reachable(nodes.size(), false);
-                for (auto& [v, _] : nodes[u].edges) {
-                    dfsMark(v, reachable);
-                }
-
-                for (auto [v, _] : nodes[u].edges) {
-                    bool redundant = false;
-                    for (auto [w, _] : nodes[u].edges) {
-                        if (w != v && reachable[v]) {
-                            redundant = true;
+                for (size_t i = 0; i < nodes[u].edges.size(); ++i) {
+                    auto v = nodes[u].edges[i].first;
+                    // Custom reachability: skip the direct edge (u, v)
+                    std::vector<bool> seen(nodes.size(), false);
+                    bool altPath = false;
+                    for (size_t j = 0; j < nodes[u].edges.size(); ++j) {
+                        if (i == j) continue; // skip direct edge
+                        if (dfsReachable(nodes[u].edges[j].first, v, seen, nullptr)) {
+                            altPath = true;
                             break;
                         }
                     }
-                    if (!redundant) reducedEdges[u].push_back(v);
+                    if (!altPath) {
+                        reducedEdges[u].push_back(v);
+                    }
                 }
             }
-
             return reducedEdges;
         }
 
