@@ -207,7 +207,7 @@ namespace dag
             return order;
         }
 
-        std::vector<std::vector<DagIndexType>> transitivelyReducePerNode() const {
+        std::vector<std::vector<DagIndexType>> transitivelyReducePerNode(ReachableFn edgeFilter = nullptr) const {
             std::vector<std::vector<DagIndexType>> reducedEdges(nodes.size());
 
             auto order = topologicalSort();
@@ -219,7 +219,7 @@ namespace dag
                     bool altPath = false;
                     for (size_t j = 0; j < nodes[u].edges.size(); ++j) {
                         if (i == j) continue; // skip direct edge
-                        if (dfsReachable(nodes[u].edges[j].first, v, seen, nullptr)) {
+                        if (dfsReachable(nodes[u].edges[j].first, v, seen, edgeFilter)) {
                             altPath = true;
                             break;
                         }
