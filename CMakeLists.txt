@@ -10,7 +10,8 @@ set(CMAKE_CXX_EXTENSIONS OFF) # Optional: disable compiler-specific extensions
 option(BUILD_DAG_SAMPLE "Build the dag-object executable AKA sample" OFF)
 
 # Add dag library (always)
-add_subdirectory(dag)
+add_library(dag INTERFACE)
+target_include_directories(dag INTERFACE "dag/include")
 
 # Conditionally add the executable
 if(BUILD_DAG_SAMPLE)
