@@ -210,7 +210,7 @@ namespace dag
         std::vector<std::vector<DagIndexType>> transitivelyReducePerNode(ReachableFn edgeFilter = nullptr) const {
             std::vector<std::vector<DagIndexType>> reducedEdges(nodes.size());
 
-            auto order = topologicalSort();
+            auto order = topologicalSort(edgeFilter);
             for (auto u : order) {
                 for (size_t i = 0; i < nodes[u].edges.size(); ++i) {
                     auto v = nodes[u].edges[i].first;
