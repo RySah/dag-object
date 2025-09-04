@@ -6,6 +6,7 @@
 #include <queue>
 #include <functional>
 #include <string>
+#include <ostream>
 
 // Hopefully can bring some memory/size optimizations at compile time.
 // USE CASE:
