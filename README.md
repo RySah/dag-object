@@ -24,7 +24,7 @@ Optionally use fetch on cmake:
 FetchContent_Declare(
   dag_object
   GIT_REPOSITORY https://github.com/RySah/dag-object.git
-  GIT_TAG v1.0.0
+  GIT_TAG v1.2.0
 )
 FetchContent_MakeAvailable(dag_object)
 ```
